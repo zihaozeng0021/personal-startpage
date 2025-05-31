@@ -4,6 +4,7 @@
     <TimeCard />
     <Background />
     <SearchBar />
+    <Portfolio />
   </div>
 </template>
 
@@ -11,6 +12,7 @@
 import Background from "./components/Background.vue";
 import TimeCard from "./components/TimeCard.vue";
 import SearchBar from "./components/SearchBar.vue";
+import Portfolio from "./components/Portfolio.vue";
 
 export default {
   name: "App",
@@ -18,6 +20,7 @@ export default {
     Background,
     TimeCard,
     SearchBar,
+    Portfolio,
   },
 };
 </script>
