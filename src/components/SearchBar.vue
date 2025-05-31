@@ -3,14 +3,46 @@
   <div
       class="search-bar-container"
       :style="containerStyle"
+      @click.self="closeEngineMenu"
   >
-    <div class="logo-wrapper" :style="logoWrapperStyle">
+    <div
+        class="logo-wrapper"
+        :style="logoWrapperStyle"
+        @click.stop="toggleEngineMenu"
+        title="Select search engine"
+        tabindex="0"
+        @keydown.escape="closeEngineMenu"
+    >
       <img
-          class="google-logo"
+          class="search-engine-logo"
           :style="logoStyle"
-          src="/icon/google-logo.png"
-          alt="Google logo"
+          :src="currentEngine.logo"
+          :alt="currentEngine.name + ' logo'"
       />
+
+      <transition name="engine-popover">
+        <div
+            v-if="showEngineMenu"
+            class="engine-popover"
+            ref="popover"
+            @click.stop
+        >
+          <div
+              v-for="(engine, idx) in engines"
+              :key="engine.name"
+              class="engine-icon-item"
+              :class="{ selected: idx === currentEngineIndex }"
+              @click="selectEngine(idx)"
+              :title="engine.name"
+          >
+            <img
+                class="engine-icon"
+                :src="engine.logo"
+                :alt="engine.name + ' logo'"
+            />
+          </div>
+        </div>
+      </transition>
     </div>
 
     <input
@@ -19,13 +51,14 @@
         class="search-input"
         :style="inputStyle"
         type="text"
-        placeholder="Search Google"
+        :placeholder="`Search ${currentEngine.name}`"
     />
 
     <button
         class="search-button"
         :style="buttonStyle"
         @click="performSearch"
+        title="Search"
     >
       <img
           class="search-icon"
@@ -38,41 +71,65 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const BAR_WIDTH = 600;
-const BAR_HEIGHT = 72;
-const BORDER_RADIUS = 36;
-const BACKDROP_BLUR = '12px';
+const BAR_WIDTH = 800
+const BAR_HEIGHT = 72
+const BORDER_RADIUS = 36
+const BACKDROP_BLUR = '12px'
 
-const LOGO_SIZE = 48;
-const LOGO_BG_OPACITY = 0.8;
+const LOGO_SIZE = 48
+const LOGO_BG_OPACITY = 0.8
 
-const INPUT_HEIGHT = 48;
-const INPUT_PADDING = 16;
-const INPUT_BORDER_RADIUS = 24;
+const INPUT_HEIGHT = 48
+const INPUT_PADDING = 16
+const INPUT_BORDER_RADIUS = 24
 
-const BUTTON_SIZE = 52;
-const BUTTON_BG_OPACITY = 0.95;
+const BUTTON_SIZE = 52
+const BUTTON_BG_OPACITY = 0.95
 
 // Breakpoints
-const MOBILE_BREAKPOINT = 700;
-const MOBILE_BAR_WIDTH = '90%';
-const MOBILE_BAR_HEIGHT = 64;
-const MOBILE_LOGO_SIZE = 40;
-const MOBILE_LOGO_MARGIN = 8;
-const MOBILE_INPUT_HEIGHT = 40;
-const MOBILE_INPUT_PADDING = 12;
-const MOBILE_INPUT_BORDER_RADIUS = 20;
-const MOBILE_BUTTON_SIZE = 48;
+const MOBILE_BREAKPOINT = 700
+const MOBILE_BAR_WIDTH = '90%'
+const MOBILE_BAR_HEIGHT = 64
+const MOBILE_LOGO_SIZE = 40
+const MOBILE_LOGO_MARGIN = 8
+const MOBILE_INPUT_HEIGHT = 40
+const MOBILE_INPUT_PADDING = 12
+const MOBILE_INPUT_BORDER_RADIUS = 20
+const MOBILE_BUTTON_SIZE = 48
 
-// ─── REACTIVE STATE ──────────────────────────────────────────────────────────
-const query = ref('');
+// ─── SEARCH ENGINES SETUP ──────────────────────────────────────────────────────
+const engines = [
+  {
+    name: 'Google',
+    logo: '/icon/google-logo.png',
+    baseUrl: 'https://www.google.com/search?q=',
+  },
+  {
+    name: 'GitHub',
+    logo: '/icon/github-logo.png',
+    baseUrl: 'https://github.com/search?q=',
+  },
+  {
+    name: 'Google Scholar',
+    logo: '/icon/google-scholar-logo.png',
+    baseUrl: 'https://scholar.google.com/scholar?q=',
+  },
+]
 
-// ─── COMPUTED STYLES ──────────────────────────────────────────────────────────
+const currentEngineIndex = ref(0)
+const currentEngine = computed(() => engines[currentEngineIndex.value])
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const query = ref('')
+const showEngineMenu = ref(false)
+const popover = ref(null)
+
+// ─── STYLES ───────────────────────────────────────────────────────────────────
 const containerStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
   return {
     position: 'absolute',
     left: '50%',
@@ -90,14 +147,15 @@ const containerStyle = computed(() => {
     borderRadius: `${BORDER_RADIUS}px`,
     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
     backdropClip: 'padding-box',
-  };
-});
+  }
+})
 
 const logoWrapperStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const size = isMobile ? MOBILE_LOGO_SIZE : LOGO_SIZE;
-  const marginRight = isMobile ? MOBILE_LOGO_MARGIN : 12;
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
+  const size = isMobile ? MOBILE_LOGO_SIZE : LOGO_SIZE
+  const marginRight = isMobile ? MOBILE_LOGO_MARGIN : 12
   return {
+    position: 'relative',
     flex: 'none',
     display: 'flex',
     alignItems: 'center',
@@ -108,25 +166,26 @@ const logoWrapperStyle = computed(() => {
     backgroundColor: `rgba(255, 255, 255, ${LOGO_BG_OPACITY})`,
     borderRadius: '50%',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-  };
-});
+    cursor: 'pointer',
+  }
+})
 
 const logoStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const logoDim = isMobile ? 20 : 24;
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
+  const logoDim = isMobile ? 20 : 24
   return {
     width: `${logoDim}px`,
     height: `${logoDim}px`,
     objectFit: 'contain',
-  };
-});
+  }
+})
 
 const inputStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const height = isMobile ? MOBILE_INPUT_HEIGHT : INPUT_HEIGHT;
-  const padding = isMobile ? MOBILE_INPUT_PADDING : INPUT_PADDING;
-  const borderRadius = isMobile ? MOBILE_INPUT_BORDER_RADIUS : INPUT_BORDER_RADIUS;
-  const fontSize = isMobile ? '0.9rem' : '1rem';
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
+  const height = isMobile ? MOBILE_INPUT_HEIGHT : INPUT_HEIGHT
+  const padding = isMobile ? MOBILE_INPUT_PADDING : INPUT_PADDING
+  const borderRadius = isMobile ? MOBILE_INPUT_BORDER_RADIUS : INPUT_BORDER_RADIUS
+  const fontSize = isMobile ? '0.9rem' : '1rem'
   return {
     flex: '1',
     height: `${height}px`,
@@ -139,13 +198,13 @@ const inputStyle = computed(() => {
     borderRadius: `${borderRadius}px`,
     outline: 'none',
     transition: 'background-color 0.2s, border-color 0.2s',
-  };
-});
+  }
+})
 
 const buttonStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const size = isMobile ? MOBILE_BUTTON_SIZE : BUTTON_SIZE;
-  const marginLeft = isMobile ? 8 : 12;
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
+  const size = isMobile ? MOBILE_BUTTON_SIZE : BUTTON_SIZE
+  const marginLeft = isMobile ? 8 : 12
   return {
     flex: 'none',
     display: 'flex',
@@ -159,29 +218,120 @@ const buttonStyle = computed(() => {
     borderRadius: '50%',
     cursor: 'pointer',
     transition: 'background-color 0.2s, transform 0.1s',
-  };
-});
+  }
+})
 
 const iconStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const iconDim = isMobile ? 20 : 24;
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
+  const iconDim = isMobile ? 20 : 24
   return {
     width: `${iconDim}px`,
     height: `${iconDim}px`,
     objectFit: 'contain',
-  };
-});
+  }
+})
 
-// ─── FUNCTIONS ────────────────────────────────────────────────────────────────
+// ─── LIFECYCLE: detect clicks outside popover ─────────────────────────────────
+function handleClickOutside(event) {
+  if (
+      showEngineMenu.value &&
+      popover.value &&
+      !popover.value.contains(event.target) &&
+      !event.target.closest('.logo-wrapper')
+  ) {
+    showEngineMenu.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('click', handleClickOutside)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('click', handleClickOutside)
+})
+
+// ─── METHODS ─────────────────────────────────────────────────────────────────
+function toggleEngineMenu() {
+  showEngineMenu.value = !showEngineMenu.value
+}
+
+function closeEngineMenu() {
+  showEngineMenu.value = false
+}
+
+function selectEngine(idx) {
+  currentEngineIndex.value = idx
+  showEngineMenu.value = false
+}
+
 function performSearch() {
-  const trimmed = query.value.trim();
-  if (!trimmed) return;
-  const url = `https://www.google.com/search?q=${encodeURIComponent(trimmed)}`;
-  window.open(url, '_blank');
+  const trimmed = query.value.trim()
+  if (!trimmed) return
+  const url = `${currentEngine.value.baseUrl}${encodeURIComponent(trimmed)}`
+  window.open(url, '_blank')
 }
 </script>
 
 <style scoped>
+/* ──────────────────────────────────────────────────────────────────────────── */
+.engine-popover-enter-active,
+.engine-popover-leave-active {
+  transition: all 0.15s ease-out;
+}
+.engine-popover-enter-from,
+.engine-popover-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.engine-popover-enter-to,
+.engine-popover-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.engine-popover {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  padding: 6px 8px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.engine-icon-item {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(245, 245, 245, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.engine-icon-item:hover {
+  background-color: rgba(230, 230, 230, 1);
+  transform: scale(1.05);
+}
+
+.engine-icon-item.selected {
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.engine-icon {
+  max-width: 24px;
+  max-height: 24px;
+  object-fit: contain;
+}
+
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
