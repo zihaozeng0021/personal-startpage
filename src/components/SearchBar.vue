@@ -117,6 +117,26 @@ const engines = [
     logo: '/icon/google-scholar-logo.png',
     baseUrl: 'https://scholar.google.com/scholar?q=',
   },
+  {
+    name: 'Baidu',
+    logo: '/icon/baidu-logo.png',
+    baseUrl: 'https://www.baidu.com/s?wd=',
+  },
+  {
+    name: 'YouTube',
+    logo: '/icon/youtube-logo.png',
+    baseUrl: 'https://www.youtube.com/results?search_query=',
+  },
+  {
+    name: 'Bilibili',
+    logo: '/icon/bilibili-logo.png',
+    baseUrl: 'https://search.bilibili.com/all?keyword=',
+  },
+  {
+    name: 'Bing',
+    logo: '/icon/bing-logo.webp',
+    baseUrl: 'https://www.bing.com/search?q=',
+  },
 ]
 
 const currentEngineIndex = ref(0)
