@@ -1,23 +1,25 @@
 <!-- src/App.vue -->
 <template>
   <div id="app">
+    <TimeCard />
     <Background />
   </div>
 </template>
 
 <script>
 import Background from "./components/Background.vue";
+import TimeCard from "./components/TimeCard.vue";
 
 export default {
   name: "App",
   components: {
     Background,
+    TimeCard,
   },
 };
 </script>
 
 <style>
-
 html,
 body {
   margin: 0;
