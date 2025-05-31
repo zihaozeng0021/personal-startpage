@@ -1,11 +1,13 @@
-< !-- src/components/TimeCard.vue -->
+<!-- src/components/TimeCard.vue -->
 <template>
   <div
       class="time-weather"
       :style="containerStyle"
       @mousedown.prevent="startDrag"
   >
-    <p class="time-text">{{ currentTime }}</p>
+    <p class="date-text">{{ dateText }}</p>
+
+    <p class="time-text">{{ timeText }}</p>
 
     <div v-if="weatherData">
       <p class="weather-text">
@@ -23,7 +25,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const CARD_WIDTH = 800;
+const CARD_WIDTH = 600;
 const CARD_HEIGHT = 200;
 
 const WEATHER_CODE_MAP = {
@@ -58,33 +60,40 @@ const WEATHER_CODE_MAP = {
 };
 
 // ─── REACTIVE STATE ──────────────────────────────────────────────────────────
-const currentTime = ref('');
+const dateText = ref('');
+const timeText = ref('');
 const weatherData = ref(null);
 const errorMsg = ref('');
 
 const dragging = ref(false);
-const position = ref({ x: 0, y: 0 });
+const position = ref({ x: null, y: null });
 const dragOffset = { x: 0, y: 0 };
 
 let timer = null;
 
 // ─── COMPUTED STYLES ──────────────────────────────────────────────────────────
-const containerStyle = computed(() => ({
-  position: 'absolute',
-  left: `${position.value.x}px`,
-  top: `${position.value.y}px`,
-  width: `${CARD_WIDTH}px`,
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
-  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  padding: '16px',
-  border: '1px solid rgba(255, 255, 255, 0.3)',
-  borderRadius: '12px',
-  boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-  backdropClip: 'padding-box',
-  cursor: dragging.value ? 'grabbing' : 'grab',
-  userSelect: 'none'
-}));
+const containerStyle = computed(() => {
+  const usePercent =
+      position.value.x === null && position.value.y === null;
+
+  return {
+    position: 'absolute',
+    left: usePercent ? '50%' : `${position.value.x}px`,
+    top: usePercent ? '20%' : `${position.value.y}px`,
+    transform: usePercent ? 'translate(-50%, -50%)' : 'none',
+    width: `${CARD_WIDTH}px`,
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    padding: '16px',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    borderRadius: '12px',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+    backdropClip: 'padding-box',
+    cursor: dragging.value ? 'grabbing' : 'grab',
+    userSelect: 'none'
+  };
+});
 
 // ─── FUNCTIONS ────────────────────────────────────────────────────────────────
 function updateTime() {
@@ -92,15 +101,13 @@ function updateTime() {
 
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
+  const weekday = now.toLocaleDateString('en-US', { weekday: 'long' });
+  dateText.value = `${month} - ${day} ${weekday}`;
 
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
-  const timePart = `${hours}:${minutes}:${seconds}`;
-
-  const weekday = now.toLocaleDateString('en-US', { weekday: 'long' });
-
-  currentTime.value = `Date: ${month}/${day}    Time: ${timePart}    Weekday: ${weekday}`;
+  timeText.value = `${hours}:${minutes}:${seconds}`;
 }
 
 function codeToDesc(code) {
@@ -109,6 +116,13 @@ function codeToDesc(code) {
 
 function startDrag(event) {
   dragging.value = true;
+
+  if (position.value.x === null && position.value.y === null) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    position.value.x = rect.left;
+    position.value.y = rect.top;
+  }
+
   dragOffset.x = event.clientX - position.value.x;
   dragOffset.y = event.clientY - position.value.y;
   window.addEventListener('mousemove', onDrag);
@@ -129,18 +143,10 @@ function stopDrag() {
 
 // ─── LIFECYCLE HOOKS ─────────────────────────────────────────────────────────
 onMounted(() => {
-  // Initialize time display
   updateTime();
   timer = setInterval(updateTime, 1000);
 
-  // Center card horizontally; place at 1/4 down vertically
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
 
-  position.value.x = viewportWidth / 2 - CARD_WIDTH / 2;
-  position.value.y = viewportHeight / 4 - CARD_HEIGHT / 2;
-
-  // Fetch weather data if geolocation is available
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -176,15 +182,30 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+@font-face {
+  font-family: 'DSEG7Classic';
+  src: url('public/fonts/DSEG7ClassicMini-Regular.woff2') format('woff2'),
+  url('public/fonts/DSEG7ClassicMini-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .time-weather p {
   margin: 6px 0;
-  colour: #fff;
+  color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-.time-text {
+.date-text {
   font-size: 1.4rem;
   font-weight: bold;
+}
+
+.time-text {
+  font-family: 'DSEG7Classic', monospace;
+  font-size: 3rem;
+  letter-spacing: 0.05em;
+  color: #0ff;
 }
 
 .weather-text {
