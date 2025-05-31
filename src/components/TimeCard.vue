@@ -1,3 +1,4 @@
+< !-- src/components/TimeCard.vue -->
 <template>
   <div
       class="time-weather"

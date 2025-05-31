@@ -3,18 +3,21 @@
   <div id="app">
     <TimeCard />
     <Background />
+    <SearchBar />
   </div>
 </template>
 
 <script>
 import Background from "./components/Background.vue";
 import TimeCard from "./components/TimeCard.vue";
+import SearchBar from "./components/SearchBar.vue";
 
 export default {
   name: "App",
   components: {
     Background,
     TimeCard,
+    SearchBar,
   },
 };
 </script>
