@@ -1,10 +1,18 @@
+<!-- src/App.vue -->
 <template>
-  <div id="app"></div>
+  <div id="app">
+    <Background />
+  </div>
 </template>
 
 <script>
+import Background from "./components/Background.vue";
+
 export default {
   name: "App",
+  components: {
+    Background,
+  },
 };
 </script>
 
@@ -17,14 +25,6 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-body {
-  background-image: url("/background/background1.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
 }
 
 #app {
