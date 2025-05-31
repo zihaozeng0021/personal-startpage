@@ -4,7 +4,7 @@
       :style="containerStyle"
       @mousedown.prevent="startDrag"
   >
-    <p class="time-text">Current time: {{ currentTime }}</p>
+    <p class="time-text">{{ currentTime }}</p>
 
     <div v-if="weatherData">
       <p class="weather-text">
@@ -22,8 +22,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const CARD_WIDTH = 300;
-const CARD_HEIGHT = 150;
+const CARD_WIDTH = 800;
+const CARD_HEIGHT = 200;
 
 const WEATHER_CODE_MAP = {
   0: 'Clear',
@@ -88,7 +88,18 @@ const containerStyle = computed(() => ({
 // ─── FUNCTIONS ────────────────────────────────────────────────────────────────
 function updateTime() {
   const now = new Date();
-  currentTime.value = now.toLocaleTimeString();
+
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const timePart = `${hours}:${minutes}:${seconds}`;
+
+  const weekday = now.toLocaleDateString('en-US', { weekday: 'long' });
+
+  currentTime.value = `Date: ${month}/${day}    Time: ${timePart}    Weekday: ${weekday}`;
 }
 
 function codeToDesc(code) {
