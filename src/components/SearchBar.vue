@@ -104,37 +104,37 @@ const MOBILE_BUTTON_SIZE = 48
 const engines = [
   {
     name: 'Google',
-    logo: '/icon/google-logo.png',
+    logo: 'icon/google-logo.png',
     baseUrl: 'https://www.google.com/search?q=',
   },
   {
     name: 'GitHub',
-    logo: '/icon/github-logo.png',
+    logo: 'icon/github-logo.png',
     baseUrl: 'https://github.com/search?q=',
   },
   {
     name: 'Google Scholar',
-    logo: '/icon/google-scholar-logo.png',
+    logo: 'icon/google-scholar-logo.png',
     baseUrl: 'https://scholar.google.com/scholar?q=',
   },
   {
     name: 'Baidu',
-    logo: '/icon/baidu-logo.png',
+    logo: 'icon/baidu-logo.png',
     baseUrl: 'https://www.baidu.com/s?wd=',
   },
   {
     name: 'YouTube',
-    logo: '/icon/youtube-logo.png',
+    logo: 'icon/youtube-logo.png',
     baseUrl: 'https://www.youtube.com/results?search_query=',
   },
   {
     name: 'Bilibili',
-    logo: '/icon/bilibili-logo.png',
+    logo: 'icon/bilibili-logo.png',
     baseUrl: 'https://search.bilibili.com/all?keyword=',
   },
   {
     name: 'Bing',
-    logo: '/icon/bing-logo.webp',
+    logo: 'icon/bing-logo.webp',
     baseUrl: 'https://www.bing.com/search?q=',
   },
 ]
