@@ -1,6 +1,6 @@
 <!-- src/components/TimeCard.vue -->
 <template>
-  <div class="time-weather" :style="containerStyle">
+  <div class="time-weather">
     <p class="date-text">{{ dateText }}</p>
     <p class="time-text">{{ timeText }}</p>
 
@@ -17,12 +17,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const CARD_WIDTH = 600;
-const CARD_HEIGHT = 200;
-
 const WEATHER_CODE_MAP = {
   0: 'Clear',
   1: 'Mainly clear',
@@ -62,28 +59,6 @@ const errorMsg = ref('');
 
 let timer = null;
 
-// ─── COMPUTED STYLES ──────────────────────────────────────────────────────────
-const containerStyle = computed(() => {
-  return {
-    position: 'absolute',
-    left: '50%',
-    top: '20%',
-    transform: 'translate(-50%, -50%)',
-    width: `${CARD_WIDTH}px`,
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    padding: '16px',
-    border: '1px solid rgba(255, 255, 255, 0.3)',
-    borderRadius: '12px',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-    backdropClip: 'padding-box',
-    cursor: 'default',
-    userSelect: 'none'
-  };
-});
-
-// ─── FUNCTIONS ────────────────────────────────────────────────────────────────
 function updateTime() {
   const now = new Date();
 
@@ -142,10 +117,31 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* ─── CONTAINER ──────────────────────────────────────────────────────────────── */
+.time-weather {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  backdrop-clip: padding-box;
+  cursor: default;
+  user-select: none;
+}
+
+/* ─── FONTS ─────────────────────────────────────────────────────────────────── */
 @font-face {
   font-family: 'DSEG7Classic';
   src: url('/fonts/DSEG7ClassicMini-Regular.woff2') format('woff2'),
-  url('/fonts/DSEG7ClassicMini-Regular.woff')  format('woff');
+  url('/fonts/DSEG7ClassicMini-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -156,6 +152,7 @@ onUnmounted(() => {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
+/* ─── DATE / TIME TEXT ───────────────────────────────────────────────────────── */
 .date-text {
   font-size: 1.4rem;
   font-weight: bold;
@@ -168,6 +165,7 @@ onUnmounted(() => {
   color: #0ff;
 }
 
+/* ─── WEATHER / ERROR / LOADING ─────────────────────────────────────────────── */
 .weather-text {
   font-size: 1.2rem;
 }
@@ -176,5 +174,74 @@ onUnmounted(() => {
 .loading-text {
   font-size: 1.2rem;
   font-style: italic;
+}
+
+/* ─── RESPONSIVE ADJUSTMENTS ─────────────────────────────────────────────────── */
+/* Phones (screen width ≤ 480px): shrink font sizes */
+@media (max-width: 480px) {
+  .date-text {
+    font-size: 1.1rem;
+  }
+  .time-text {
+    font-size: 2rem;
+  }
+  .weather-text,
+  .error-text,
+  .loading-text {
+    font-size: 1rem;
+  }
+}
+
+/* Small tablets (481px – 768px): moderately smaller fonts */
+@media (min-width: 481px) and (max-width: 768px) {
+  .date-text {
+    font-size: 0.96rem;
+  }
+  .time-text {
+    font-size: 2rem;
+  }
+  .weather-text,
+  .error-text,
+  .loading-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* when screen height ≤ 1200px, make card and font smaller */
+@media (max-height: 1200px) {
+  .time-weather {
+    padding: 12px;
+    max-width: 400px;
+  }
+  .date-text {
+    font-size: 0.96rem;
+  }
+  .time-text {
+    font-size: 2rem;
+  }
+  .weather-text,
+  .error-text,
+  .loading-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* ─── LARGE‐SCREEN ADJUSTMENTS (screen width ≥ 2560px) ───────────────────────────────────── */
+@media (min-width: 2560px) {
+  .time-weather {
+    max-width: 800px;
+    padding: 24px;
+  }
+  .date-text {
+    font-size: 2rem;
+  }
+  .time-text {
+    font-size: 4rem;
+  }
+  .weather-text,
+  .error-text,
+  .loading-text {
+    font-size: 1.5rem;
+  }
 }
 </style>

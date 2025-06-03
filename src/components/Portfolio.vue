@@ -1,8 +1,23 @@
+<!-- src/components/Portfolio.vue -->
 <template>
   <div class="footer-links">
-    <a href="https://zihaozeng0021.github.io/personal-portfolio/" target="_blank" rel="noopener noreferrer">About the Author</a>
-    <a href="https://github.com/zihaozeng0021/personal-startpage" target="_blank" rel="noopener noreferrer">Code for the Project</a>
-    <a href="https://github.com/zihaozeng0021" target="_blank" rel="noopener noreferrer">My GitHub</a>
+    <a
+        href="https://zihaozeng0021.github.io/personal-portfolio/"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+      About the Author
+    </a>
+    <a
+        href="https://github.com/zihaozeng0021/personal-startpage"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+      Code for the Project
+    </a>
+    <a href="https://github.com/zihaozeng0021" target="_blank" rel="noopener noreferrer">
+      My GitHub
+    </a>
     <a href="mailto:zihaozeng0021@gmail.com">Send me Emails</a>
   </div>
 </template>
@@ -38,5 +53,18 @@
 
 .footer-links a:hover {
   text-decoration: underline;
+}
+
+@media (min-width: 2560px) {
+  .footer-links {
+    bottom: 52px;
+    gap: 44px;
+    padding: 20px 40px;
+    border-radius: 12px;
+  }
+
+  .footer-links a {
+    font-size: 1.2rem;
+  }
 }
 </style>
