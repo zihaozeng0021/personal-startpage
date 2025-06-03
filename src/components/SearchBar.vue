@@ -147,33 +147,43 @@ const query = ref('')
 const showEngineMenu = ref(false)
 const popover = ref(null)
 
-// ─── STYLES ───────────────────────────────────────────────────────────────────
-const containerStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  return {
-    position: 'absolute',
-    left: '50%',
-    top: '40%',
-    transform: 'translate(-50%, -50%)',
-    display: 'flex',
-    alignItems: 'center',
-    width: isMobile ? MOBILE_BAR_WIDTH : `${BAR_WIDTH}px`,
-    height: isMobile ? `${MOBILE_BAR_HEIGHT}px` : `${BAR_HEIGHT}px`,
-    padding: `0 16px`,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    backdropFilter: `blur(${BACKDROP_BLUR})`,
-    WebkitBackdropFilter: `blur(${BACKDROP_BLUR})`,
-    border: '1px solid rgba(255, 255, 255, 0.3)',
-    borderRadius: `${BORDER_RADIUS}px`,
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-    backdropClip: 'padding-box',
-  }
+const isMobile = ref(window.innerWidth <= MOBILE_BREAKPOINT)
+
+function updateIsMobile() {
+  isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
+}
+
+onMounted(() => {
+  window.addEventListener('resize', updateIsMobile)
+  window.addEventListener('click', handleClickOutside)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateIsMobile)
+  window.removeEventListener('click', handleClickOutside)
 })
 
+const containerStyle = computed(() => ({
+  position: 'absolute',
+  left: '50%',
+  top: '40%',
+  transform: 'translate(-50%, -50%)',
+  display: 'flex',
+  alignItems: 'center',
+  width: isMobile.value ? MOBILE_BAR_WIDTH : `${BAR_WIDTH}px`,
+  height: isMobile.value ? `${MOBILE_BAR_HEIGHT}px` : `${BAR_HEIGHT}px`,
+  padding: '0 16px',
+  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+  backdropFilter: `blur(${BACKDROP_BLUR})`,
+  WebkitBackdropFilter: `blur(${BACKDROP_BLUR})`,
+  border: '1px solid rgba(255, 255, 255, 0.3)',
+  borderRadius: `${BORDER_RADIUS}px`,
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+  backdropClip: 'padding-box',
+}))
+
 const logoWrapperStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const size = isMobile ? MOBILE_LOGO_SIZE : LOGO_SIZE
-  const marginRight = isMobile ? MOBILE_LOGO_MARGIN : 12
+  const size = isMobile.value ? MOBILE_LOGO_SIZE : LOGO_SIZE
+  const marginRight = isMobile.value ? MOBILE_LOGO_MARGIN : 12
   return {
     position: 'relative',
     flex: 'none',
@@ -191,8 +201,7 @@ const logoWrapperStyle = computed(() => {
 })
 
 const logoStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const logoDim = isMobile ? 20 : 24
+  const logoDim = isMobile.value ? 20 : 24
   return {
     width: `${logoDim}px`,
     height: `${logoDim}px`,
@@ -201,11 +210,13 @@ const logoStyle = computed(() => {
 })
 
 const inputStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const height = isMobile ? MOBILE_INPUT_HEIGHT : INPUT_HEIGHT
-  const padding = isMobile ? MOBILE_INPUT_PADDING : INPUT_PADDING
-  const borderRadius = isMobile ? MOBILE_INPUT_BORDER_RADIUS : INPUT_BORDER_RADIUS
-  const fontSize = isMobile ? '0.9rem' : '1rem'
+  const height = isMobile.value ? MOBILE_INPUT_HEIGHT : INPUT_HEIGHT
+  const padding = isMobile.value ? MOBILE_INPUT_PADDING : INPUT_PADDING
+  const borderRadius = isMobile.value
+      ? MOBILE_INPUT_BORDER_RADIUS
+      : INPUT_BORDER_RADIUS
+  const fontSize = isMobile.value ? '0.9rem' : '1rem'
+
   return {
     flex: '1',
     height: `${height}px`,
@@ -222,9 +233,8 @@ const inputStyle = computed(() => {
 })
 
 const buttonStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const size = isMobile ? MOBILE_BUTTON_SIZE : BUTTON_SIZE
-  const marginLeft = isMobile ? 8 : 12
+  const size = isMobile.value ? MOBILE_BUTTON_SIZE : BUTTON_SIZE
+  const marginLeft = isMobile.value ? 8 : 12
   return {
     flex: 'none',
     display: 'flex',
@@ -242,8 +252,7 @@ const buttonStyle = computed(() => {
 })
 
 const iconStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const iconDim = isMobile ? 20 : 24
+  const iconDim = isMobile.value ? 20 : 24
   return {
     width: `${iconDim}px`,
     height: `${iconDim}px`,
@@ -251,7 +260,7 @@ const iconStyle = computed(() => {
   }
 })
 
-// ─── LIFECYCLE: detect clicks outside popover ─────────────────────────────────
+// ─── HANDLERS ─────────────────────────────────────────────────────────────────
 function handleClickOutside(event) {
   if (
       showEngineMenu.value &&
@@ -263,14 +272,6 @@ function handleClickOutside(event) {
   }
 }
 
-onMounted(() => {
-  window.addEventListener('click', handleClickOutside)
-})
-onBeforeUnmount(() => {
-  window.removeEventListener('click', handleClickOutside)
-})
-
-// ─── METHODS ─────────────────────────────────────────────────────────────────
 function toggleEngineMenu() {
   showEngineMenu.value = !showEngineMenu.value
 }
@@ -293,7 +294,7 @@ function performSearch() {
 </script>
 
 <style scoped>
-/* ──────────────────────────────────────────────────────────────────────────── */
+/* ─── TRANSITION FOR THE POP‐OVER ───────────────────────────────────────────── */
 .engine-popover-enter-active,
 .engine-popover-leave-active {
   transition: all 0.15s ease-out;
@@ -309,6 +310,7 @@ function performSearch() {
   transform: scale(1);
 }
 
+/* ─── POP‐OVER STYLING ───────────────────────────────────────────────────────── */
 .engine-popover {
   position: absolute;
   top: 100%;
@@ -325,6 +327,7 @@ function performSearch() {
   z-index: 10;
 }
 
+/* ─── ENGINE ICONS ─────────────────────────────────────────────────────────── */
 .engine-icon-item {
   width: 36px;
   height: 36px;
@@ -336,12 +339,10 @@ function performSearch() {
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
 }
-
 .engine-icon-item:hover {
   background-color: rgba(230, 230, 230, 1);
   transform: scale(1.05);
 }
-
 .engine-icon-item.selected {
   box-shadow: 0 0 0 2px #3b82f6;
 }
@@ -352,20 +353,20 @@ function performSearch() {
   object-fit: contain;
 }
 
+/* ─── INPUT FOCUS & PLACEHOLDER ─────────────────────────────────────────────── */
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
 }
-
 .search-input:focus {
   background-color: rgba(255, 255, 255, 0.3);
   border-color: rgba(255, 255, 255, 0.6);
 }
 
+/* ─── BUTTON EFFECTS ────────────────────────────────────────────────────────── */
 .search-button:hover {
   background-color: rgba(255, 255, 255, 1);
 }
-
 .search-button:active {
   transform: scale(0.95);
 }

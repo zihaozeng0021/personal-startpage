@@ -1,3 +1,4 @@
+<!-- src/components/Portfolio.vue -->
 <template>
   <div class="footer-links">
     <a href="https://zihaozeng0021.github.io/personal-portfolio/" target="_blank" rel="noopener noreferrer">About the Author</a>
