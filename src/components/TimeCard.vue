@@ -1,12 +1,7 @@
 <!-- src/components/TimeCard.vue -->
 <template>
-  <div
-      class="time-weather"
-      :style="containerStyle"
-      @mousedown.prevent="startDrag"
-  >
+  <div class="time-weather" :style="containerStyle">
     <p class="date-text">{{ dateText }}</p>
-
     <p class="time-text">{{ timeText }}</p>
 
     <div v-if="weatherData">
@@ -65,22 +60,15 @@ const timeText = ref('');
 const weatherData = ref(null);
 const errorMsg = ref('');
 
-const dragging = ref(false);
-const position = ref({ x: null, y: null });
-const dragOffset = { x: 0, y: 0 };
-
 let timer = null;
 
 // ─── COMPUTED STYLES ──────────────────────────────────────────────────────────
 const containerStyle = computed(() => {
-  const usePercent =
-      position.value.x === null && position.value.y === null;
-
   return {
     position: 'absolute',
-    left: usePercent ? '50%' : `${position.value.x}px`,
-    top: usePercent ? '20%' : `${position.value.y}px`,
-    transform: usePercent ? 'translate(-50%, -50%)' : 'none',
+    left: '50%',
+    top: '20%',
+    transform: 'translate(-50%, -50%)',
     width: `${CARD_WIDTH}px`,
     backdropFilter: 'blur(10px)',
     WebkitBackdropFilter: 'blur(10px)',
@@ -90,7 +78,7 @@ const containerStyle = computed(() => {
     borderRadius: '12px',
     boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
     backdropClip: 'padding-box',
-    cursor: dragging.value ? 'grabbing' : 'grab',
+    cursor: 'default',
     userSelect: 'none'
   };
 });
@@ -114,38 +102,10 @@ function codeToDesc(code) {
   return WEATHER_CODE_MAP[code] || 'Unknown';
 }
 
-function startDrag(event) {
-  dragging.value = true;
-
-  if (position.value.x === null && position.value.y === null) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    position.value.x = rect.left;
-    position.value.y = rect.top;
-  }
-
-  dragOffset.x = event.clientX - position.value.x;
-  dragOffset.y = event.clientY - position.value.y;
-  window.addEventListener('mousemove', onDrag);
-  window.addEventListener('mouseup', stopDrag);
-}
-
-function onDrag(event) {
-  if (!dragging.value) return;
-  position.value.x = event.clientX - dragOffset.x;
-  position.value.y = event.clientY - dragOffset.y;
-}
-
-function stopDrag() {
-  dragging.value = false;
-  window.removeEventListener('mousemove', onDrag);
-  window.removeEventListener('mouseup', stopDrag);
-}
-
 // ─── LIFECYCLE HOOKS ─────────────────────────────────────────────────────────
 onMounted(() => {
   updateTime();
   timer = setInterval(updateTime, 1000);
-
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
@@ -184,8 +144,8 @@ onUnmounted(() => {
 <style scoped>
 @font-face {
   font-family: 'DSEG7Classic';
-  src: url('public/fonts/DSEG7ClassicMini-Regular.woff2') format('woff2'),
-  url('public/fonts/DSEG7ClassicMini-Regular.woff') format('woff');
+  src: url('/fonts/DSEG7ClassicMini-Regular.woff2') format('woff2'),
+  url('/fonts/DSEG7ClassicMini-Regular.woff')  format('woff');
   font-weight: normal;
   font-style: normal;
 }
