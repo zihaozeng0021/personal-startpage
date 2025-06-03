@@ -1,37 +1,25 @@
 <!-- src/components/TimeCard.vue -->
 <template>
-  <div class="time-weather" :style="containerStyle">
-    <p class="date-text" :style="dateStyle">{{ dateText }}</p>
-    <p class="time-text" :style="timeStyle">{{ timeText }}</p>
+  <div class="time-weather">
+    <p class="date-text">{{ dateText }}</p>
+    <p class="time-text">{{ timeText }}</p>
 
     <div v-if="weatherData">
-      <p class="weather-text" :style="weatherStyle">
+      <p class="weather-text">
         Weather: {{ weatherData.current_weather.weathercodeDesc }},
         Temperature: {{ weatherData.current_weather.temperature }} ℃
       </p>
     </div>
 
-    <p
-        v-else-if="errorMsg"
-        class="error-text"
-        :style="weatherStyle"
-    >{{ errorMsg }}</p>
-    <p
-        v-else
-        class="loading-text"
-        :style="weatherStyle"
-    >Retrieving weather information...</p>
+    <p v-else-if="errorMsg" class="error-text">{{ errorMsg }}</p>
+    <p v-else class="loading-text">Retrieving weather information...</p>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const CARD_WIDTH = 600;
-const CARD_HEIGHT = 150;
-const MOBILE_BREAKPOINT = 700;
-
 const WEATHER_CODE_MAP = {
   0: 'Clear',
   1: 'Mainly clear',
@@ -63,60 +51,14 @@ const WEATHER_CODE_MAP = {
   99: 'Thunderstorm with heavy hail'
 };
 
-// ─── STATE & REACTIVE LAYOUT FLAG ────────────────────────────────────────────
+// ─── REACTIVE STATE ──────────────────────────────────────────────────────────
 const dateText = ref('');
 const timeText = ref('');
 const weatherData = ref(null);
 const errorMsg = ref('');
-const isMobile = ref(window.innerWidth <= MOBILE_BREAKPOINT);
+
 let timer = null;
 
-// ─── UPDATE isMobile WHEN RESIZING ───────────────────────────────────────────
-function updateIsMobile() {
-  isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT;
-}
-
-// ─── COMPUTED STYLES ──────────────────────────────────────────────────────────
-const containerStyle = computed(() => ({
-  position: 'absolute',
-  left: '50%',
-  top: isMobile.value ? '15%' : '20%',
-  transform: 'translate(-50%, -50%)',
-  width: isMobile.value ? '90%' : `${CARD_WIDTH}px`,
-  height: `${CARD_HEIGHT}px`,
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
-  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  padding: isMobile.value ? '12px' : '16px',
-  border: '1px solid rgba(255, 255, 255, 0.3)',
-  borderRadius: '12px',
-  boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-  backdropClip: 'padding-box',
-  cursor: 'default',
-  userSelect: 'none'
-}));
-
-const dateStyle = computed(() => ({
-  fontSize: isMobile.value ? '1rem' : '1.4rem',
-  fontWeight: 'bold',
-  margin: '4px 0',
-}));
-
-const timeStyle = computed(() => ({
-  fontFamily: "'DSEG7Classic', monospace",
-  fontSize: isMobile.value ? '2rem' : '3rem',
-  letterSpacing: '0.05em',
-  color: '#fff',            // ← changed to white
-  margin: '4px 0',
-}));
-
-const weatherStyle = computed(() => ({
-  fontSize: isMobile.value ? '1rem' : '1.2rem',
-  margin: '4px 0',
-  fontStyle: 'italic',
-}));
-
-// ─── TIME & WEATHER LOGIC ────────────────────────────────────────────────────
 function updateTime() {
   const now = new Date();
 
@@ -135,11 +77,10 @@ function codeToDesc(code) {
   return WEATHER_CODE_MAP[code] || 'Unknown';
 }
 
+// ─── LIFECYCLE HOOKS ─────────────────────────────────────────────────────────
 onMounted(() => {
   updateTime();
   timer = setInterval(updateTime, 1000);
-
-  window.addEventListener('resize', updateIsMobile);
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
@@ -170,24 +111,99 @@ onMounted(() => {
   }
 });
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
   clearInterval(timer);
-  window.removeEventListener('resize', updateIsMobile);
 });
 </script>
 
 <style scoped>
+/* ─── CONTAINER ──────────────────────────────────────────────────────────────── */
+.time-weather {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  backdrop-clip: padding-box;
+  cursor: default;
+  user-select: none;
+}
+
+/* ─── FONTS ─────────────────────────────────────────────────────────────────── */
 @font-face {
   font-family: 'DSEG7Classic';
   src: url('/fonts/DSEG7ClassicMini-Regular.woff2') format('woff2'),
-  url('/fonts/DSEG7ClassicMini-Regular.woff') format('woff');
+  url('/fonts/DSEG7ClassicMini-Regular.woff')  format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 .time-weather p {
+  margin: 6px 0;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
+/* ─── DATE / TIME TEXT ───────────────────────────────────────────────────────── */
+.date-text {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.time-text {
+  font-family: 'DSEG7Classic', monospace;
+  font-size: 3rem;
+  letter-spacing: 0.05em;
+  color: #0ff;
+}
+
+/* ─── WEATHER / ERROR / LOADING ─────────────────────────────────────────────── */
+.weather-text {
+  font-size: 1.2rem;
+}
+
+.error-text,
+.loading-text {
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+/* ─── RESPONSIVE ADJUSTMENTS ─────────────────────────────────────────────────── */
+/* Phones (screen width ≤ 480px): shrink font sizes */
+@media (max-width: 480px) {
+  .date-text {
+    font-size: 1.1rem;
+  }
+  .time-text {
+    font-size: 2rem;
+  }
+  .weather-text,
+  .error-text,
+  .loading-text {
+    font-size: 1rem;
+  }
+}
+
+/* Small tablets (481px – 768px): moderately smaller fonts */
+@media (min-width: 481px) and (max-width: 768px) {
+  .date-text {
+    font-size: 1.2rem;
+  }
+  .time-text {
+    font-size: 2.5rem;
+  }
+  .weather-text,
+  .error-text,
+  .loading-text {
+    font-size: 1.1rem;
+  }
+}
 </style>
