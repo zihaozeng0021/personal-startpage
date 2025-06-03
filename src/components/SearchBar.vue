@@ -102,8 +102,8 @@ const MOBILE_INPUT_PADDING = 12
 const MOBILE_INPUT_BORDER_RADIUS = 20
 const MOBILE_BUTTON_SIZE = 48
 
-// Large-screen dimensions (>= 1920px)
-const LARGE_BREAKPOINT = 1920
+// Large-screen dimensions (>= 2560px)
+const LARGE_BREAKPOINT = 2560
 const LARGE_BAR_WIDTH = 1500
 const LARGE_BAR_HEIGHT = 120
 const LARGE_BORDER_RADIUS = 60
@@ -441,7 +441,7 @@ function performSearch() {
   transform: scale(0.95);
 }
 
-@media (min-width: 1920px) {
+@media (min-width: 2560px) {
   .engine-icon-item {
     width: 48px;
     height: 48px;

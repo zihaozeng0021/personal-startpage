@@ -55,7 +55,7 @@
   text-decoration: underline;
 }
 
-@media (min-width: 1920px) {
+@media (min-width: 2560px) {
   .footer-links {
     bottom: 52px;
     gap: 44px;

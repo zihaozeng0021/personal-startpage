@@ -226,8 +226,8 @@ onUnmounted(() => {
   }
 }
 
-/* ─── LARGE‐SCREEN ADJUSTMENTS (screen width ≥ 1920px) ───────────────────────────────────── */
-@media (min-width: 1920px) {
+/* ─── LARGE‐SCREEN ADJUSTMENTS (screen width ≥ 2560px) ───────────────────────────────────── */
+@media (min-width: 2560px) {
   .time-weather {
     max-width: 800px;
     padding: 24px;
