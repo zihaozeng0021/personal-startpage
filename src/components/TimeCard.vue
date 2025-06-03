@@ -141,7 +141,7 @@ onUnmounted(() => {
 @font-face {
   font-family: 'DSEG7Classic';
   src: url('/fonts/DSEG7ClassicMini-Regular.woff2') format('woff2'),
-  url('/fonts/DSEG7ClassicMini-Regular.woff')  format('woff');
+  url('/fonts/DSEG7ClassicMini-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -198,7 +198,7 @@ onUnmounted(() => {
     font-size: 0.96rem;
   }
   .time-text {
-    font-size: 2.0rem;
+    font-size: 2rem;
   }
   .weather-text,
   .error-text,
@@ -213,19 +213,35 @@ onUnmounted(() => {
     padding: 12px;
     max-width: 400px;
   }
-
   .date-text {
     font-size: 0.96rem;
   }
-
   .time-text {
-    font-size: 2.0rem;
+    font-size: 2rem;
   }
-
   .weather-text,
   .error-text,
   .loading-text {
     font-size: 1.1rem;
+  }
+}
+
+/* ─── LARGE‐SCREEN ADJUSTMENTS (screen width ≥ 1920px) ───────────────────────────────────── */
+@media (min-width: 1920px) {
+  .time-weather {
+    max-width: 800px;
+    padding: 24px;
+  }
+  .date-text {
+    font-size: 2rem;
+  }
+  .time-text {
+    font-size: 4rem;
+  }
+  .weather-text,
+  .error-text,
+  .loading-text {
+    font-size: 1.5rem;
   }
 }
 </style>
