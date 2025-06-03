@@ -1,13 +1,8 @@
 <!-- src/components/SearchBar.vue -->
 <template>
-  <div
-      class="search-bar-container"
-      :style="containerStyle"
-      @click.self="closeEngineMenu"
-  >
+  <div class="search-bar-container" @click.self="closeEngineMenu">
     <div
         class="logo-wrapper"
-        :style="logoWrapperStyle"
         @click.stop="toggleEngineMenu"
         title="Select search engine"
         tabindex="0"
@@ -15,7 +10,6 @@
     >
       <img
           class="search-engine-logo"
-          :style="logoStyle"
           :src="currentEngine.logo"
           :alt="currentEngine.name + ' logo'"
       />
@@ -49,20 +43,17 @@
         v-model="query"
         @keyup.enter="performSearch"
         class="search-input"
-        :style="inputStyle"
         type="text"
         :placeholder="`Search ${currentEngine.name}`"
     />
 
     <button
         class="search-button"
-        :style="buttonStyle"
         @click="performSearch"
         title="Search"
     >
       <img
           class="search-icon"
-          :style="iconStyle"
           src="/icon/search-icon.jpg"
           alt="Search"
       />
@@ -71,185 +62,54 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const BAR_WIDTH = 800
-const BAR_HEIGHT = 72
-const BORDER_RADIUS = 36
-const BACKDROP_BLUR = '12px'
-
-const LOGO_SIZE = 48
-const LOGO_BG_OPACITY = 0.8
-
-const INPUT_HEIGHT = 48
-const INPUT_PADDING = 16
-const INPUT_BORDER_RADIUS = 24
-
-const BUTTON_SIZE = 52
-const BUTTON_BG_OPACITY = 0.95
-
-// Breakpoints
-const MOBILE_BREAKPOINT = 700
-const MOBILE_BAR_WIDTH = '90%'
-const MOBILE_BAR_HEIGHT = 64
-const MOBILE_LOGO_SIZE = 40
-const MOBILE_LOGO_MARGIN = 8
-const MOBILE_INPUT_HEIGHT = 40
-const MOBILE_INPUT_PADDING = 12
-const MOBILE_INPUT_BORDER_RADIUS = 20
-const MOBILE_BUTTON_SIZE = 48
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 
 // ─── SEARCH ENGINES SETUP ──────────────────────────────────────────────────────
 const engines = [
   {
-    name: 'Google',
-    logo: 'icon/google-logo.png',
-    baseUrl: 'https://www.google.com/search?q=',
+    name: "Google",
+    logo: "icon/google-logo.png",
+    baseUrl: "https://www.google.com/search?q=",
   },
   {
-    name: 'GitHub',
-    logo: 'icon/github-logo.png',
-    baseUrl: 'https://github.com/search?q=',
+    name: "GitHub",
+    logo: "icon/github-logo.png",
+    baseUrl: "https://github.com/search?q=",
   },
   {
-    name: 'Google Scholar',
-    logo: 'icon/google-scholar-logo.png',
-    baseUrl: 'https://scholar.google.com/scholar?q=',
+    name: "Google Scholar",
+    logo: "icon/google-scholar-logo.png",
+    baseUrl: "https://scholar.google.com/scholar?q=",
   },
   {
-    name: 'Baidu',
-    logo: 'icon/baidu-logo.png',
-    baseUrl: 'https://www.baidu.com/s?wd=',
+    name: "Baidu",
+    logo: "icon/baidu-logo.png",
+    baseUrl: "https://www.baidu.com/s?wd=",
   },
   {
-    name: 'YouTube',
-    logo: 'icon/youtube-logo.png',
-    baseUrl: 'https://www.youtube.com/results?search_query=',
+    name: "YouTube",
+    logo: "icon/youtube-logo.png",
+    baseUrl: "https://www.youtube.com/results?search_query=",
   },
   {
-    name: 'Bilibili',
-    logo: 'icon/bilibili-logo.png',
-    baseUrl: 'https://search.bilibili.com/all?keyword=',
+    name: "Bilibili",
+    logo: "icon/bilibili-logo.png",
+    baseUrl: "https://search.bilibili.com/all?keyword=",
   },
   {
-    name: 'Bing',
-    logo: 'icon/bing-logo.webp',
-    baseUrl: 'https://www.bing.com/search?q=',
+    name: "Bing",
+    logo: "icon/bing-logo.webp",
+    baseUrl: "https://www.bing.com/search?q=",
   },
-]
+];
 
-const currentEngineIndex = ref(0)
-const currentEngine = computed(() => engines[currentEngineIndex.value])
+const currentEngineIndex = ref(0);
+const currentEngine = computed(() => engines[currentEngineIndex.value]);
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
-const query = ref('')
-const showEngineMenu = ref(false)
-const popover = ref(null)
-
-// ─── STYLES ───────────────────────────────────────────────────────────────────
-const containerStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  return {
-    position: 'absolute',
-    left: '50%',
-    top: '40%',
-    transform: 'translate(-50%, -50%)',
-    display: 'flex',
-    alignItems: 'center',
-    width: isMobile ? MOBILE_BAR_WIDTH : `${BAR_WIDTH}px`,
-    height: isMobile ? `${MOBILE_BAR_HEIGHT}px` : `${BAR_HEIGHT}px`,
-    padding: `0 16px`,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    backdropFilter: `blur(${BACKDROP_BLUR})`,
-    WebkitBackdropFilter: `blur(${BACKDROP_BLUR})`,
-    border: '1px solid rgba(255, 255, 255, 0.3)',
-    borderRadius: `${BORDER_RADIUS}px`,
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-    backdropClip: 'padding-box',
-  }
-})
-
-const logoWrapperStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const size = isMobile ? MOBILE_LOGO_SIZE : LOGO_SIZE
-  const marginRight = isMobile ? MOBILE_LOGO_MARGIN : 12
-  return {
-    position: 'relative',
-    flex: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: `${size}px`,
-    height: `${size}px`,
-    marginRight: `${marginRight}px`,
-    backgroundColor: `rgba(255, 255, 255, ${LOGO_BG_OPACITY})`,
-    borderRadius: '50%',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    cursor: 'pointer',
-  }
-})
-
-const logoStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const logoDim = isMobile ? 20 : 24
-  return {
-    width: `${logoDim}px`,
-    height: `${logoDim}px`,
-    objectFit: 'contain',
-  }
-})
-
-const inputStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const height = isMobile ? MOBILE_INPUT_HEIGHT : INPUT_HEIGHT
-  const padding = isMobile ? MOBILE_INPUT_PADDING : INPUT_PADDING
-  const borderRadius = isMobile ? MOBILE_INPUT_BORDER_RADIUS : INPUT_BORDER_RADIUS
-  const fontSize = isMobile ? '0.9rem' : '1rem'
-  return {
-    flex: '1',
-    height: `${height}px`,
-    padding: `0 ${padding}px`,
-    fontSize,
-    fontFamily: "'PingFang SC', 'Microsoft YaHei', sans-serif",
-    color: 'rgba(255, 255, 255, 0.95)',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    border: '1px solid rgba(255, 255, 255, 0.4)',
-    borderRadius: `${borderRadius}px`,
-    outline: 'none',
-    transition: 'background-color 0.2s, border-color 0.2s',
-  }
-})
-
-const buttonStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const size = isMobile ? MOBILE_BUTTON_SIZE : BUTTON_SIZE
-  const marginLeft = isMobile ? 8 : 12
-  return {
-    flex: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: `${size}px`,
-    height: `${size}px`,
-    marginLeft: `${marginLeft}px`,
-    backgroundColor: `rgba(255, 255, 255, ${BUTTON_BG_OPACITY})`,
-    border: 'none',
-    borderRadius: '50%',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s, transform 0.1s',
-  }
-})
-
-const iconStyle = computed(() => {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT
-  const iconDim = isMobile ? 20 : 24
-  return {
-    width: `${iconDim}px`,
-    height: `${iconDim}px`,
-    objectFit: 'contain',
-  }
-})
+const query = ref("");
+const showEngineMenu = ref(false);
+const popover = ref(null);
 
 // ─── LIFECYCLE: detect clicks outside popover ─────────────────────────────────
 function handleClickOutside(event) {
@@ -257,43 +117,140 @@ function handleClickOutside(event) {
       showEngineMenu.value &&
       popover.value &&
       !popover.value.contains(event.target) &&
-      !event.target.closest('.logo-wrapper')
+      !event.target.closest(".logo-wrapper")
   ) {
-    showEngineMenu.value = false
+    showEngineMenu.value = false;
   }
 }
 
 onMounted(() => {
-  window.addEventListener('click', handleClickOutside)
-})
+  window.addEventListener("click", handleClickOutside);
+});
 onBeforeUnmount(() => {
-  window.removeEventListener('click', handleClickOutside)
-})
+  window.removeEventListener("click", handleClickOutside);
+});
 
 // ─── METHODS ─────────────────────────────────────────────────────────────────
 function toggleEngineMenu() {
-  showEngineMenu.value = !showEngineMenu.value
+  showEngineMenu.value = !showEngineMenu.value;
 }
 
 function closeEngineMenu() {
-  showEngineMenu.value = false
+  showEngineMenu.value = false;
 }
 
 function selectEngine(idx) {
-  currentEngineIndex.value = idx
-  showEngineMenu.value = false
+  currentEngineIndex.value = idx;
+  showEngineMenu.value = false;
 }
 
 function performSearch() {
-  const trimmed = query.value.trim()
-  if (!trimmed) return
-  const url = `${currentEngine.value.baseUrl}${encodeURIComponent(trimmed)}`
-  window.open(url, '_blank')
+  const trimmed = query.value.trim();
+  if (!trimmed) return;
+  const url = `${currentEngine.value.baseUrl}${encodeURIComponent(trimmed)}`;
+  window.open(url, "_blank");
 }
 </script>
 
 <style scoped>
 /* ──────────────────────────────────────────────────────────────────────────── */
+/* Mobile‐first: viewport width ≤700px */
+.search-bar-container {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  width: 90%;
+  max-width: none; /* will be overridden in larger breakpoints */
+  height: 64px;
+  padding: 0 12px;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  backdrop-clip: padding-box;
+  z-index: 5;
+}
+
+.logo-wrapper {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.search-engine-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.search-input {
+  flex: 1;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 0.9rem;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  outline: none;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.search-input:focus {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.search-button {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-left: 8px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.search-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.search-button:active {
+  transform: scale(0.95);
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* ─── Engine‐popover Animations ─────────────────────────────────────────────── */
 .engine-popover-enter-active,
 .engine-popover-leave-active {
   transition: all 0.15s ease-out;
@@ -309,12 +266,13 @@ function performSearch() {
   transform: scale(1);
 }
 
+/* ─── Engine‐popover Panel ──────────────────────────────────────────────────── */
 .engine-popover {
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 8px;
+  margin-top: 6px;
   padding: 6px 8px;
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
@@ -352,21 +310,41 @@ function performSearch() {
   object-fit: contain;
 }
 
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
-}
+/* ─── Responsive Breakpoint: >700px ─────────────────────────────────────────── */
+@media (min-width: 701px) {
+  .search-bar-container {
+    width: 800px;
+    max-width: 800px;
+    height: 72px;
+    padding: 0 16px;
+    border-radius: 36px;
+  }
 
-.search-input:focus {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.6);
-}
+  .logo-wrapper {
+    width: 48px;
+    height: 48px;
+    margin-right: 12px;
+  }
+  .search-engine-logo {
+    width: 24px;
+    height: 24px;
+  }
 
-.search-button:hover {
-  background-color: rgba(255, 255, 255, 1);
-}
+  .search-input {
+    height: 48px;
+    padding: 0 16px;
+    font-size: 1rem;
+    border-radius: 24px;
+  }
 
-.search-button:active {
-  transform: scale(0.95);
+  .search-button {
+    width: 52px;
+    height: 52px;
+    margin-left: 12px;
+  }
+  .search-icon {
+    width: 24px;
+    height: 24px;
+  }
 }
 </style>
