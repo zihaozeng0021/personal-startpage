@@ -57,7 +57,7 @@
 
 @media (min-width: 1920px) {
   .footer-links {
-    bottom: 52px;       
+    bottom: 52px;
     gap: 44px;
     padding: 20px 40px;
     border-radius: 12px;

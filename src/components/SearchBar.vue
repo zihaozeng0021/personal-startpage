@@ -74,6 +74,8 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
+
+// Base (mid-sized) dimensions
 const BAR_WIDTH = 800
 const BAR_HEIGHT = 72
 const BORDER_RADIUS = 36
@@ -89,7 +91,7 @@ const INPUT_BORDER_RADIUS = 24
 const BUTTON_SIZE = 52
 const BUTTON_BG_OPACITY = 0.95
 
-// Breakpoints
+// Mobile dimensions (<= 900px)
 const MOBILE_BREAKPOINT = 900
 const MOBILE_BAR_WIDTH = '90%'
 const MOBILE_BAR_HEIGHT = 64
@@ -100,43 +102,31 @@ const MOBILE_INPUT_PADDING = 12
 const MOBILE_INPUT_BORDER_RADIUS = 20
 const MOBILE_BUTTON_SIZE = 48
 
+// Large-screen dimensions (>= 1920px)
+const LARGE_BREAKPOINT = 1920
+const LARGE_BAR_WIDTH = 1500
+const LARGE_BAR_HEIGHT = 120
+const LARGE_BORDER_RADIUS = 60
+
+const LARGE_LOGO_SIZE = 84
+const LARGE_LOGO_MARGIN = 24
+
+const LARGE_INPUT_HEIGHT = 84
+const LARGE_INPUT_PADDING = 30
+const LARGE_INPUT_BORDER_RADIUS = 42
+
+const LARGE_BUTTON_SIZE = 80
+const LARGE_ICON_DIM = 36
+
 // ─── SEARCH ENGINES SETUP ──────────────────────────────────────────────────────
 const engines = [
-  {
-    name: 'Google',
-    logo: 'icon/google-logo.png',
-    baseUrl: 'https://www.google.com/search?q=',
-  },
-  {
-    name: 'GitHub',
-    logo: 'icon/github-logo.png',
-    baseUrl: 'https://github.com/search?q=',
-  },
-  {
-    name: 'Google Scholar',
-    logo: 'icon/google-scholar-logo.png',
-    baseUrl: 'https://scholar.google.com/scholar?q=',
-  },
-  {
-    name: 'Baidu',
-    logo: 'icon/baidu-logo.png',
-    baseUrl: 'https://www.baidu.com/s?wd=',
-  },
-  {
-    name: 'YouTube',
-    logo: 'icon/youtube-logo.png',
-    baseUrl: 'https://www.youtube.com/results?search_query=',
-  },
-  {
-    name: 'Bilibili',
-    logo: 'icon/bilibili-logo.png',
-    baseUrl: 'https://search.bilibili.com/all?keyword=',
-  },
-  {
-    name: 'Bing',
-    logo: 'icon/bing-logo.webp',
-    baseUrl: 'https://www.bing.com/search?q=',
-  },
+  { name: 'Google',          logo: 'icon/google-logo.png',          baseUrl: 'https://www.google.com/search?q=' },
+  { name: 'GitHub',          logo: 'icon/github-logo.png',          baseUrl: 'https://github.com/search?q=' },
+  { name: 'Google Scholar',  logo: 'icon/google-scholar-logo.png',  baseUrl: 'https://scholar.google.com/scholar?q=' },
+  { name: 'Baidu',           logo: 'icon/baidu-logo.png',           baseUrl: 'https://www.baidu.com/s?wd=' },
+  { name: 'YouTube',         logo: 'icon/youtube-logo.png',         baseUrl: 'https://www.youtube.com/results?search_query=' },
+  { name: 'Bilibili',        logo: 'icon/bilibili-logo.png',        baseUrl: 'https://search.bilibili.com/all?keyword=' },
+  { name: 'Bing',            logo: 'icon/bing-logo.webp',           baseUrl: 'https://www.bing.com/search?q=' },
 ]
 
 const currentEngineIndex = ref(0)
@@ -148,43 +138,74 @@ const showEngineMenu = ref(false)
 const popover = ref(null)
 
 const isMobile = ref(window.innerWidth <= MOBILE_BREAKPOINT)
+const isLarge  = ref(window.innerWidth >= LARGE_BREAKPOINT)
 
-function updateIsMobile() {
+function updateSizeFlags() {
   isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
+  isLarge.value  = window.innerWidth >= LARGE_BREAKPOINT
 }
 
 onMounted(() => {
-  window.addEventListener('resize', updateIsMobile)
+  window.addEventListener('resize', updateSizeFlags)
   window.addEventListener('click', handleClickOutside)
 })
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateIsMobile)
+  window.removeEventListener('resize', updateSizeFlags)
   window.removeEventListener('click', handleClickOutside)
 })
 
-const containerStyle = computed(() => ({
-  position: 'absolute',
-  left: '50%',
-  top: '40%',
-  transform: 'translate(-50%, -50%)',
-  display: 'flex',
-  alignItems: 'center',
-  width: isMobile.value ? MOBILE_BAR_WIDTH : `${BAR_WIDTH}px`,
-  height: isMobile.value ? `${MOBILE_BAR_HEIGHT}px` : `${BAR_HEIGHT}px`,
-  padding: '0 16px',
-  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-  backdropFilter: `blur(${BACKDROP_BLUR})`,
-  WebkitBackdropFilter: `blur(${BACKDROP_BLUR})`,
-  border: '1px solid rgba(255, 255, 255, 0.3)',
-  borderRadius: `${BORDER_RADIUS}px`,
-  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-  backdropClip: 'padding-box',
-  overflow: 'visible',
-}))
+// ─── COMPUTED STYLES ──────────────────────────────────────────────────────────
+
+const containerStyle = computed(() => {
+  let width, height, borderRadius
+  if (isMobile.value) {
+    width = MOBILE_BAR_WIDTH
+    height = `${MOBILE_BAR_HEIGHT}px`
+    borderRadius = `${MOBILE_INPUT_BORDER_RADIUS * 2.3}px`
+  } else if (isLarge.value) {
+    width = `${LARGE_BAR_WIDTH}px`
+    height = `${LARGE_BAR_HEIGHT}px`
+    borderRadius = `${LARGE_BORDER_RADIUS}px`
+  } else {
+    width = `${BAR_WIDTH}px`
+    height = `${BAR_HEIGHT}px`
+    borderRadius = `${BORDER_RADIUS}px`
+  }
+
+  return {
+    position: 'absolute',
+    left: '50%',
+    top: '40%',
+    transform: 'translate(-50%, -50%)',
+    display: 'flex',
+    alignItems: 'center',
+    width,
+    height,
+    padding: '0 16px',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backdropFilter: `blur(${BACKDROP_BLUR})`,
+    WebkitBackdropFilter: `blur(${BACKDROP_BLUR})`,
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    borderRadius,
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+    backdropClip: 'padding-box',
+    overflow: 'visible',
+  }
+})
 
 const logoWrapperStyle = computed(() => {
-  const size = isMobile.value ? MOBILE_LOGO_SIZE : LOGO_SIZE
-  const marginRight = isMobile.value ? MOBILE_LOGO_MARGIN : 12
+  let size, marginRight
+  if (isMobile.value) {
+    size = MOBILE_LOGO_SIZE
+    marginRight = MOBILE_LOGO_MARGIN
+  } else if (isLarge.value) {
+    size = LARGE_LOGO_SIZE
+    marginRight = LARGE_LOGO_MARGIN
+  } else {
+    size = LOGO_SIZE
+    marginRight = 12
+  }
+
   return {
     position: 'relative',
     flex: 'none',
@@ -202,7 +223,15 @@ const logoWrapperStyle = computed(() => {
 })
 
 const logoStyle = computed(() => {
-  const logoDim = isMobile.value ? 20 : 24
+  let logoDim
+  if (isMobile.value) {
+    logoDim = 20
+  } else if (isLarge.value) {
+    logoDim = 28
+  } else {
+    logoDim = 24
+  }
+
   return {
     width: `${logoDim}px`,
     height: `${logoDim}px`,
@@ -211,12 +240,23 @@ const logoStyle = computed(() => {
 })
 
 const inputStyle = computed(() => {
-  const height = isMobile.value ? MOBILE_INPUT_HEIGHT : INPUT_HEIGHT
-  const padding = isMobile.value ? MOBILE_INPUT_PADDING : INPUT_PADDING
-  const borderRadius = isMobile.value
-      ? MOBILE_INPUT_BORDER_RADIUS
-      : INPUT_BORDER_RADIUS
-  const fontSize = isMobile.value ? '0.9rem' : '1rem'
+  let height, padding, borderRadius, fontSize
+  if (isMobile.value) {
+    height = MOBILE_INPUT_HEIGHT
+    padding = MOBILE_INPUT_PADDING
+    borderRadius = MOBILE_INPUT_BORDER_RADIUS
+    fontSize = '0.9rem'
+  } else if (isLarge.value) {
+    height = LARGE_INPUT_HEIGHT
+    padding = LARGE_INPUT_PADDING
+    borderRadius = LARGE_INPUT_BORDER_RADIUS
+    fontSize = '1.1rem'
+  } else {
+    height = INPUT_HEIGHT
+    padding = INPUT_PADDING
+    borderRadius = INPUT_BORDER_RADIUS
+    fontSize = '1rem'
+  }
 
   return {
     flex: '1',
@@ -234,8 +274,18 @@ const inputStyle = computed(() => {
 })
 
 const buttonStyle = computed(() => {
-  const size = isMobile.value ? MOBILE_BUTTON_SIZE : BUTTON_SIZE
-  const marginLeft = isMobile.value ? 8 : 12
+  let size, marginLeft
+  if (isMobile.value) {
+    size = MOBILE_BUTTON_SIZE
+    marginLeft = 8
+  } else if (isLarge.value) {
+    size = LARGE_BUTTON_SIZE
+    marginLeft = 16
+  } else {
+    size = BUTTON_SIZE
+    marginLeft = 12
+  }
+
   return {
     flex: 'none',
     display: 'flex',
@@ -253,7 +303,15 @@ const buttonStyle = computed(() => {
 })
 
 const iconStyle = computed(() => {
-  const iconDim = isMobile.value ? 20 : 24
+  let iconDim
+  if (isMobile.value) {
+    iconDim = 20
+  } else if (isLarge.value) {
+    iconDim = LARGE_ICON_DIM
+  } else {
+    iconDim = 24
+  }
+
   return {
     width: `${iconDim}px`,
     height: `${iconDim}px`,
@@ -381,5 +439,16 @@ function performSearch() {
 }
 .search-button:active {
   transform: scale(0.95);
+}
+
+@media (min-width: 1920px) {
+  .engine-icon-item {
+    width: 48px;
+    height: 48px;
+  }
+  .engine-icon {
+    max-width: 32px;
+    max-height: 32px;
+  }
 }
 </style>
