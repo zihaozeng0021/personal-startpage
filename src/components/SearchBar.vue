@@ -179,6 +179,7 @@ const containerStyle = computed(() => ({
   borderRadius: `${BORDER_RADIUS}px`,
   boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
   backdropClip: 'padding-box',
+  overflow: 'visible',
 }))
 
 const logoWrapperStyle = computed(() => {
@@ -294,6 +295,10 @@ function performSearch() {
 </script>
 
 <style scoped>
+.search-bar-container {
+  overflow: visible;
+}
+
 /* ─── TRANSITION FOR THE POP‐OVER ───────────────────────────────────────────── */
 .engine-popover-enter-active,
 .engine-popover-leave-active {
@@ -325,6 +330,13 @@ function performSearch() {
   display: flex;
   gap: 8px;
   z-index: 10;
+}
+
+@media (max-width: 700px) {
+  .engine-popover {
+    left: 0;
+    transform: translateX(0);
+  }
 }
 
 /* ─── ENGINE ICONS ─────────────────────────────────────────────────────────── */
