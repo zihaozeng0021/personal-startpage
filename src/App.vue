@@ -35,6 +35,9 @@ body {
   overflow: hidden;
 }
 
+#app {
+  min-height: 100vh;
+}
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -55,7 +58,6 @@ body {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  min-height: 100vh;
 }
 
 @media (prefers-color-scheme: light) {
@@ -71,9 +73,4 @@ body {
   }
 }
 
-@media (max-width: 480px) {
-  #app {
-    padding: 1rem;
-  }
-}
 </style>
