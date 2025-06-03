@@ -195,11 +195,33 @@ onUnmounted(() => {
 /* Small tablets (481px – 768px): moderately smaller fonts */
 @media (min-width: 481px) and (max-width: 768px) {
   .date-text {
-    font-size: 1.2rem;
+    font-size: 0.96rem;
   }
   .time-text {
-    font-size: 2.5rem;
+    font-size: 2.0rem;
   }
+  .weather-text,
+  .error-text,
+  .loading-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* when screen height ≤ 1200px, make card and font smaller */
+@media (max-height: 1200px) {
+  .time-weather {
+    padding: 12px;
+    max-width: 400px;
+  }
+
+  .date-text {
+    font-size: 0.96rem;
+  }
+
+  .time-text {
+    font-size: 2.0rem;
+  }
+
   .weather-text,
   .error-text,
   .loading-text {
