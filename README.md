@@ -37,7 +37,7 @@ Start the local development server with hot reloading:
 npm run dev
 ```
 
-Default: http://localhost:5173/personal-portfolio/
+Default: http://localhost:5173/personal-startpage/
 
 
 ## Build & Preview
@@ -54,7 +54,7 @@ Preview the Build
 npm run preview
 ```
 
-Default: http://localhost:4173/personal-portfolio/
+Default: http://localhost:4173/personal-startpage/
 
 
 ## Deployment
